@@ -1,0 +1,9 @@
+# Docker environment file
+.env
+
+# Docker volumes (if using named volumes)
+docker/volumes/
+
+# Logs
+*.log
+logs/
