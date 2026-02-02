@@ -1,0 +1,34 @@
+# Git
+.git
+.gitignore
+
+# Environment files (will be mounted separately)
+.env
+.env.local
+.env.*.local
+
+# Existing vendor (will be installed fresh in Docker)
+vendor
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Node modules
+node_modules
+
+# Test files
+tests
+phpunit.xml
+.phpunit.cache
+
+# Docker entrypoint (created inside Dockerfile)
+docker-entrypoint.sh
+
+# Logs
+*.log
+logs/
+storage/logs/*
+!storage/logs/.gitignore

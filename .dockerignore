@@ -1,5 +1,13 @@
-# Docker environment file
-.env
+# Git
+.git
+.gitignore
+
+# Docker files (don't copy to container)
+docker-compose.yml
+docker-start.bat
+docker-start.sh
+Dockerfile
+.dockerignore
 
 # Docker volumes (if using named volumes)
 docker/volumes/
@@ -7,3 +15,24 @@ docker/volumes/
 # Logs
 *.log
 logs/
+
+# Environment files (will be mounted as volume)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Node modules (if any)
+node_modules
+
+# Test files
+tests
+phpunit.xml
+
+# Cache and temp
+.phpunit.cache

@@ -56,62 +56,54 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www/html
+# Copy application files first
+COPY . /var/www/html
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-    \n\
+# Install Composer dependencies during build
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Create entrypoint script using printf (avoids CRLF issues)
+RUN printf '#!/bin/bash\n\
+    set -e\n\
     echo "================================="\n\
     echo "Starting SIMPAN Backend..."\n\
     echo "================================="\n\
+    cd /var/www/html\n\
     \n\
-    # Wait for database\n\
-    echo "Waiting for database connection..."\n\
-    until php artisan db:show 2>/dev/null | grep -q "Connection" || [ $counter -gt 30 ]; do\n\
-    echo "Database not ready, waiting... ($counter/30)"\n\
-    counter=$((counter+1))\n\
-    sleep 2\n\
-    done\n\
-    \n\
-    # Install dependencies if vendor not exists\n\
-    if [ ! -d "vendor" ]; then\n\
+    # Re-install dependencies if vendor was overwritten by volume mount\n\
+    if [ ! -f "vendor/autoload.php" ]; then\n\
     echo "Installing Composer dependencies..."\n\
-    composer install --no-interaction --prefer-dist --optimize-autoloader\n\
+    composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev\n\
     fi\n\
     \n\
     # Generate APP_KEY if not exists\n\
-    if ! grep -q "APP_KEY=base64:" .env 2>/dev/null; then\n\
+    if [ -f ".env" ] && ! grep -q "APP_KEY=base64:" .env 2>/dev/null; then\n\
     echo "Generating APP_KEY..."\n\
     php artisan key:generate --force\n\
     fi\n\
     \n\
     # Create storage link\n\
-    echo "Creating storage link..."\n\
-    php artisan storage:link\n\
+    php artisan storage:link 2>/dev/null || true\n\
     \n\
     # Run migrations\n\
     echo "Running migrations..."\n\
-    php artisan migrate --force\n\
+    php artisan migrate --force 2>/dev/null || echo "Migration skipped"\n\
     \n\
-    # Set proper permissions\n\
-    echo "Setting permissions..."\n\
-    chown -R www-data:www-data storage bootstrap/cache\n\
-    chmod -R 775 storage bootstrap/cache\n\
+    # Set permissions\n\
+    chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true\n\
+    chmod -R 775 storage bootstrap/cache 2>/dev/null || true\n\
     \n\
-    echo "================================="\n\
     echo "Backend started successfully!"\n\
-    echo "Admin Panel: http://localhost:8000/admin"\n\
-    echo "API: http://localhost:8000/api"\n\
-    echo "================================="\n\
-    \n\
-    # Start Apache\n\
-    apache2-foreground\n\
+    exec apache2-foreground\n\
     ' > /usr/local/bin/docker-entrypoint.sh \
     && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost/ || exit 1
 
 # Expose port
