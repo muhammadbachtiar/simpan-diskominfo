@@ -2,8 +2,8 @@
 .git
 .gitignore
 
-# Environment files (will be mounted separately)
-.env
+# Environment files - .env is included for production builds
+# .env is NOT ignored because we need it in the container
 .env.local
 .env.*.local
 
