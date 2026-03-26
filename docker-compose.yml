@@ -1,9 +1,6 @@
 version: '3.8'
 
 services:
-  # ===================================
-  # Backend Service (Laravel + Filament Admin Panel + API)
-  # ===================================
   backend:
     build:
       context: ./backend
@@ -11,19 +8,17 @@ services:
     container_name: simpan_backend
     restart: unless-stopped
     ports:
-      - "8002:80"
+      - "8081:80"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - simpan_backend_upload:/var/www/html/storage/app/public
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost/api || curl -f http://localhost/ || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
-
-  # ===================================
-  # Frontend Service (Laravel Public Website)
-  # ===================================
+      start_period: 60s
   frontend:
     build:
       context: ./frontend
@@ -31,13 +26,22 @@ services:
     container_name: simpan_frontend
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - "8080:80"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - simpan_frontend_upload:/var/www/html/storage/app/public
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost/ || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
-    # No custom network needed - using default bridge
+      start_period: 60s
+volumes:
+  simpan_backend_upload:
+    driver: local
+  simpan_frontend_upload:
+    driver: local
