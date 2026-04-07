@@ -32,3 +32,6 @@ docker-entrypoint.sh
 logs/
 storage/logs/*
 !storage/logs/.gitignore
+
+# Ignore symlinked storage
+public/storage
