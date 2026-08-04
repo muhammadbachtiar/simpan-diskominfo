@@ -89,6 +89,11 @@
         </section>
     @endif
     <!--Aparatur Desa End-->
+
+    <!--Survei Kepuasan Masyarakat (SKM) Component-->
+    @include('components.skm-modal')
+    <!--Survei Kepuasan Masyarakat (SKM) End-->
+
     <!--Gallery-->
     <section class="tf__event mt_95">
         <div class="container">
