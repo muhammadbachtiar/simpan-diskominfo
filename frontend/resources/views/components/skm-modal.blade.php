@@ -126,7 +126,7 @@
 
         modalTitle.textContent = "Berikan Penilaian Terbaik Anda...";
         
-        resultIframe.src = "https://surveidigital.spbe.go.id/embed/survey/eyJzdXJ2ZXlfaWQiOjIsInNlcnZpY2VfaWQiOjk0NiwiaG9zdCI6Imh0dHBzOi8vc2ltcGFuLm11YXJhZW5pbWthYi5nby5pZC8iLCJrZXkiOiJLQlJmUFhhaiJ9/embed/view/?jenis_layanan=Simpan Diskominfo";
+        resultIframe.src = "https://surveidigital.spbe.go.id/embed/survey/eyJzdXJ2ZXlfaWQiOjIsInNlcnZpY2VfaWQiOjk0NiwiaG9zdCI6Imh0dHBzOi8vc2ltcGFuLm11YXJhZW5pbWthYi5nby5pZC8iLCJrZXkiOiJWcmJhMVRsZyJ9/embed/view/?jenis_layanan=Simpan Diskominfo";
         resultIframe.style.display = 'block';
         if (respondentNameInput) respondentNameInput.value = '';
         
